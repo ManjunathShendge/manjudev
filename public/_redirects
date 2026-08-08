@@ -1,0 +1,10 @@
+# Client-side routing: every unmatched path is rewritten to index.html so
+# /blog, /blog/:slug and /studio/* survive a hard refresh and a shared link.
+# A 200 here is a rewrite, not a redirect — the URL in the address bar is left
+# alone, which is what React Router needs to read it.
+#
+# The lead form POSTs to "/". Netlify runs form handling ahead of redirect
+# rules, so this catch-all does not swallow it; if a submission ever does come
+# back as HTML instead of the success page, point the form at /__forms.html
+# instead and add a matching rule above this line.
+/*    /index.html   200

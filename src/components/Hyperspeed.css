@@ -1,0 +1,17 @@
+#lights {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: absolute;
+}
+
+/*
+  Scoped to #lights on purpose. The component ships this as a bare `canvas`
+  selector, which would also capture the ambient starfield canvas and any
+  future one — a global element selector in a shared stylesheet is a cascade
+  collision waiting to happen.
+*/
+#lights canvas {
+  width: 100%;
+  height: 100%;
+}

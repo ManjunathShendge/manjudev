@@ -1,0 +1,346 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Locally bundled — no font CDN, nothing to fall back silently. */
+@import "@fontsource-variable/unbounded";
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Unbounded Variable", "Instrument Sans Variable", sans-serif;
+  --font-heading: var(--font-display);
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  /* brand */
+  --color-gold: var(--gold);
+  --color-gold-hot: var(--gold-hot);
+  --color-gold-deep: var(--gold-deep);
+  --color-peri: var(--peri);
+  --color-mint: var(--mint);
+  --color-faint: var(--faint);
+  --color-hair: var(--hair);
+
+  /* shadcn */
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+  One committed visual world: gold on violet-biased ink.
+  Values are duplicated on :root and .dark so shadcn primitives resolve
+  correctly no matter which class ends up on <html>.
+*/
+:root,
+.dark {
+  --background: #08070c;
+  --foreground: #ece8f5;
+
+  --card: #100e1a;
+  --card-foreground: #ece8f5;
+  --popover: #100e1a;
+  --popover-foreground: #ece8f5;
+
+  --primary: #e8b75c;
+  --primary-foreground: #0b0910;
+
+  --secondary: #1a1628;
+  --secondary-foreground: #ece8f5;
+
+  --muted: #161224;
+  --muted-foreground: #a29cb8;
+
+  --accent: #1a1628;
+  --accent-foreground: #ece8f5;
+
+  --destructive: #ff6b6b;
+
+  --border: rgb(184 174 224 / 0.13);
+  --input: rgb(184 174 224 / 0.18);
+  --ring: #e8b75c;
+
+  /* sharp, technical — deliberately not rounded-lg everywhere */
+  --radius: 0.25rem;
+
+  --gold: #e8b75c;
+  --gold-hot: #ffd489;
+  --gold-deep: #b98a33;
+  --peri: #7c7bff;
+  --mint: #4ed2a8;
+  --faint: #6c667e;
+  --hair: rgb(184 174 224 / 0.07);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgb(232 183 92 / 0.26);
+    color: #fff;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  /* Uppercase utility label used for chapter numbers, dates, spec keys. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /*
+    Rendered post bodies. Written as one component class rather than a
+    typography plugin because the whole design system here is already a set of
+    custom properties, and a second opinionated type scale would fight it.
+
+    Measure is capped at ~68 characters — the body column is wider than that in
+    the layout so pull-quotes and images can breathe, and the text should not.
+  */
+  .prose-post {
+    color: var(--muted-foreground);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .prose-post > * + * {
+    margin-top: 1.15em;
+  }
+
+  .prose-post p,
+  .prose-post ul,
+  .prose-post ol,
+  .prose-post blockquote {
+    max-width: 68ch;
+  }
+
+  .prose-post h2,
+  .prose-post h3,
+  .prose-post h4 {
+    font-family: var(--font-display);
+    color: var(--foreground);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    scroll-margin-top: 6rem; /* clears the sticky header on anchor jumps */
+  }
+
+  .prose-post h2 {
+    font-size: 1.4rem;
+    margin-top: 2.6em;
+    margin-bottom: 0.2em;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--hair);
+  }
+
+  .prose-post h3 {
+    font-size: 1.08rem;
+    margin-top: 2em;
+    margin-bottom: 0.1em;
+  }
+
+  .prose-post h4 {
+    font-size: 0.95rem;
+    margin-top: 1.8em;
+  }
+
+  .prose-post strong {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+
+  .prose-post a {
+    color: var(--gold);
+    text-decoration: underline;
+    text-decoration-color: rgb(232 183 92 / 0.35);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.3s;
+  }
+
+  .prose-post a:hover {
+    text-decoration-color: var(--gold);
+  }
+
+  .prose-post ul,
+  .prose-post ol {
+    padding-left: 1.25rem;
+  }
+
+  .prose-post ul {
+    list-style: none;
+  }
+
+  .prose-post ul > li {
+    position: relative;
+  }
+
+  .prose-post ul > li::before {
+    content: "";
+    position: absolute;
+    left: -1rem;
+    top: 0.75em;
+    width: 0.3rem;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .prose-post ol {
+    list-style: decimal;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .prose-post li + li {
+    margin-top: 0.45em;
+  }
+
+  .prose-post blockquote {
+    border-left: 2px solid var(--gold);
+    padding-left: 1.25rem;
+    color: var(--foreground);
+    font-style: normal;
+  }
+
+  .prose-post code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--secondary);
+    border: 1px solid var(--hair);
+    padding: 0.1em 0.35em;
+    color: var(--gold-hot);
+  }
+
+  .prose-post pre {
+    background: #0c0a14;
+    border: 1px solid var(--hair);
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 0.84rem;
+    line-height: 1.65;
+  }
+
+  .prose-post pre code {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--foreground);
+    font-size: inherit;
+  }
+
+  .prose-post img {
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--hair);
+  }
+
+  .prose-post figcaption {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-top: 0.6rem;
+  }
+
+  .prose-post hr {
+    border: 0;
+    border-top: 1px solid var(--hair);
+    margin: 2.6em 0;
+  }
+
+  .prose-post table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .prose-post th,
+  .prose-post td {
+    border: 1px solid var(--hair);
+    padding: 0.55rem 0.75rem;
+    text-align: left;
+  }
+
+  .prose-post th {
+    color: var(--foreground);
+    font-weight: 600;
+  }
+}
+
+/* The loader's progress hairline. See src/components/Loader.tsx. */
+@keyframes loader-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
