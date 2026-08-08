@@ -232,5 +232,8 @@ function friendlyError(message: string): string {
   if (message.includes("insufficient privilege to change role")) {
     return "Only an admin can change someone's role."
   }
+  if (message.includes("may be an admin")) {
+    return "Admin is fixed to the owner's email address and cannot be granted. See migration 0009."
+  }
   return message
 }

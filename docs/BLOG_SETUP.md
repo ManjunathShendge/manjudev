@@ -50,6 +50,7 @@ whole contents of each and pressing Run:
 | 4 | `supabase/migrations/0006_open_contribution.sql` | Signing up grants writing access directly. Publishing stays gated. Reversible. |
 | 5 | `supabase/migrations/0007_remove_applications.sql` | Drops the application table and its triggers. Destructive — see the note in the file. |
 | 6 | `supabase/migrations/0008_enquiries_and_admin.sql` | The lead-form table and the `/admin` overview. **Required** — the contact form writes here. |
+| 7 | `supabase/migrations/0009_single_admin.sql` | Pins admin to one email address. Replaces step 5 below — after this, no manual promotion is needed. |
 
 `0005_withdraw_application.sql` is skipped: it added a policy to a table that
 `0007` removes. It is kept only so the numbering matches the git history.
@@ -88,13 +89,21 @@ wrong place.
 > provider under **Project Settings → Authentication → SMTP Settings**
 > (Resend and Brevo both have usable free tiers).
 
-## 5. Make yourself the admin
+## 5. Become the admin
 
-Sign up through the site first — go to `/studio`, click the **Create account**
-tab, use your own email, and click the confirmation link. That creates your
-`profiles` row with the default role, `reader`.
+Nothing to do, as long as you sign up with **shendgemanoj878@gmail.com**.
+`0009` makes that address the admin automatically — see *Admin is an address,
+not a role* below for why it works that way.
 
-Check the account exists before promoting it:
+Go to `/studio`, click the **Create account** tab, use that address, and click
+the confirmation link. Sign out and back in afterwards; the role is read once
+when the session loads, so a session opened before the migration ran will still
+think you are a contributor.
+
+To change which address owns the site, edit `public.owner_email()` in `0009`
+and re-run that file.
+
+Confirm it took:
 
 ```sql
 select u.email, p.role, u.email_confirmed_at
@@ -103,24 +112,8 @@ select u.email, p.role, u.email_confirmed_at
  order by u.created_at desc;
 ```
 
-Then, in the SQL editor:
-
-```sql
-update public.profiles p
-   set role = 'admin'
-  from auth.users u
- where u.id = p.id
-   and lower(u.email) = lower('shendgemanoj878@gmail.com')
-returning u.email, p.role;
-```
-
-The `returning` matters. Without it, an `update` that matched nothing — because
-the signup never completed, or the address differs by a character — reports
-success just as loudly as one that worked. If it prints `0 rows`, go back and
-finish the signup.
-
-Sign out and back in; the role is read once when the session loads. You now
-have the full studio: posts, review queue, applications and people.
+Your row should say `admin`. If it does not, the account was created before
+`0009` ran — re-running the file picks it up.
 
 This has to be done in SQL exactly once, on purpose. There is no "first user
 becomes admin" rule, because that is a race condition with a stranger's signup
@@ -214,8 +207,39 @@ Without this, a scheduled post simply waits for you to press Publish.
 |---|---|
 | `reader` | Read published posts, nothing else. Nobody gets this by default — set it by hand to revoke someone's writing access. |
 | `contributor` | Everything above, plus write drafts and submit them for review. **Cannot publish.** This is what a new signup gets. |
-| `editor` | Everything above, plus publish, moderate the queue, and decide applications. |
-| `admin` | Everything above, plus grant roles. |
+| `editor` | Everything above, plus publish and moderate the review queue. Grantable under **People**. |
+| `admin` | Everything above, plus `/admin` and role management. **Not grantable** — see below. |
+
+### Admin is an address, not a role
+
+`0009_single_admin.sql` pins admin to one email: whatever `public.owner_email()`
+returns, currently `shendgemanoj878@gmail.com`. Three things follow.
+
+`is_admin()` asks `auth.users` for your email instead of reading
+`profiles.role`, and every policy in the schema already routes through it — so
+redefining that one function moves the whole permission model at once.
+
+A trigger refuses to store `role = 'admin'` on anyone else, so the column and
+the check can never disagree. Without it, someone could be handed the role, see
+the admin screens, and have every request they made silently refused — a worse
+failure than being told no. The studio's People screen no longer offers Admin
+as a choice for the same reason.
+
+Signing up with that address grants admin automatically, so there is no manual
+promotion step any more.
+
+**If you lose that mailbox, you lose admin.** Recovery is to change the address
+inside `owner_email()` from the Supabase SQL editor, which runs as `postgres`
+and is not subject to any of this. To move ownership deliberately, do the same
+thing.
+
+To check it took:
+
+```sql
+select u.email, p.role
+  from public.profiles p join auth.users u on u.id = p.id
+ order by p.role;
+```
 
 Roles are enforced in the database, not in the browser. The studio hides buttons
 you cannot use, but a contributor who forges a publish request gets a rejected

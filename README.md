@@ -222,6 +222,8 @@ What it does:
 
 **The permission model lives in the database.** [0002_blog_policies.sql](supabase/migrations/0002_blog_policies.sql) is the real thing; the studio only decides which buttons to draw. A contributor cannot publish, an editor cannot make themselves an admin, and neither rule depends on the browser behaving.
 
+**Admin is an address, not a role.** [0009_single_admin.sql](supabase/migrations/0009_single_admin.sql) redefines `is_admin()` to ask `auth.users` for your email rather than to read `profiles.role` — so admin is something you *are*, not something that can be granted onward. Every policy already routes through that one function, so redefining it moves the whole model at once. A trigger refuses to store the role on anyone else, which keeps the column the UI reads and the check the database makes from ever disagreeing.
+
 Two details worth carrying in your head:
 
 - **Post HTML is sanitised on render, not on save** — see `prepareBody()` in [format.ts](src/lib/blog/format.ts). An editor is a convenience, not a security boundary, and a post can be edited by someone other than whoever publishes it. `iframe` is off the allowlist on purpose.

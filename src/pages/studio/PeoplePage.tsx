@@ -8,13 +8,19 @@ import { Avatar } from "@/components/blog/Avatar"
 import { ROLE_LABEL, type Profile, type UserRole } from "@/lib/blog/types"
 import { cn } from "@/lib/utils"
 
-const ROLES: UserRole[] = ["reader", "contributor", "editor", "admin"]
+/**
+ * Admin is not on this list. Since migration 0009 it belongs to one email
+ * address rather than being a role that can be handed out, and the database
+ * raises if anyone tries — so offering a button for it would only ever produce
+ * an error.
+ */
+const ASSIGNABLE: UserRole[] = ["reader", "contributor", "editor"]
 
 const ROLE_NOTE: Record<UserRole, string> = {
   reader: "Read-only. Use this to revoke someone's writing access.",
   contributor: "Writes drafts, submits for review. Cannot publish. New signups get this.",
   editor: "Publishes and moderates the review queue.",
-  admin: "Everything, including changing these.",
+  admin: "The owner's account only — fixed to one email address, not grantable.",
 }
 
 /**
@@ -72,7 +78,7 @@ export function PeoplePage() {
       </header>
 
       <dl className="grid gap-2 border border-hair bg-card/40 p-4 sm:grid-cols-2">
-        {ROLES.map((r) => (
+        {([...ASSIGNABLE, "admin"] as UserRole[]).map((r) => (
           <div key={r} className="flex gap-3">
             <dt className="label w-24 shrink-0 text-gold">{ROLE_LABEL[r]}</dt>
             <dd className="text-xs text-muted-foreground">{ROLE_NOTE[r]}</dd>
@@ -102,31 +108,39 @@ export function PeoplePage() {
                 <p className="label truncate text-faint">joined {formatDate(person.created_at)}</p>
               </div>
 
-              <div className="flex flex-wrap gap-1">
-                {ROLES.map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    disabled={busyId === person.id || person.id === user?.id}
-                    onClick={() => void change(person.id, r)}
-                    title={
-                      person.id === user?.id
-                        ? "You cannot change your own role — ask another admin, or use the SQL editor."
-                        : ROLE_NOTE[r]
-                    }
-                    className={cn(
-                      "label border px-2 py-1 transition-colors duration-300",
-                      person.role === r
-                        ? "border-gold/50 bg-gold/10 text-gold"
-                        : "border-hair text-faint hover:border-border hover:text-foreground",
-                      (busyId === person.id || person.id === user?.id) &&
-                        "pointer-events-none opacity-50",
-                    )}
-                  >
-                    {ROLE_LABEL[r]}
-                  </button>
-                ))}
-              </div>
+              {/* The owner has no role picker — admin is their email address,
+                  not something this screen can give or take away. */}
+              {person.role === "admin" ? (
+                <span className="label border border-gold/50 bg-gold/10 px-2.5 py-1 text-gold">
+                  Admin · owner
+                </span>
+              ) : (
+                <div className="flex flex-wrap gap-1">
+                  {ASSIGNABLE.map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      disabled={busyId === person.id || person.id === user?.id}
+                      onClick={() => void change(person.id, r)}
+                      title={
+                        person.id === user?.id
+                          ? "You cannot change your own role here — use the SQL editor."
+                          : ROLE_NOTE[r]
+                      }
+                      className={cn(
+                        "label border px-2 py-1 transition-colors duration-300",
+                        person.role === r
+                          ? "border-gold/50 bg-gold/10 text-gold"
+                          : "border-hair text-faint hover:border-border hover:text-foreground",
+                        (busyId === person.id || person.id === user?.id) &&
+                          "pointer-events-none opacity-50",
+                      )}
+                    >
+                      {ROLE_LABEL[r]}
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
           ))}
         </ul>
