@@ -120,7 +120,8 @@ src/
 ├── pages/
 │   ├── PortfolioPage.tsx      the scrolling story (was App.tsx before the blog)
 │   ├── blog/                  public listing + post page
-│   └── studio/                the CMS: dashboard, editor, review queue, people
+│   ├── studio/                the CMS: dashboard, editor, review queue, people
+│   └── admin/                 /admin — enquiries, accounts, per-author content
 ├── lib/
 │   ├── supabase.ts            the client, null until .env is filled in
 │   └── blog/                  types, queries, mutations, auth context, formatting
@@ -177,16 +178,29 @@ Verified at 390×844: no horizontal overflow, no clipped text, all six gallery i
 
 [LeadForm.tsx](src/components/LeadForm.tsx), in chapter 08. Name, email, optional company, a multi-select service picker (11 options as toggle chips), project details, and explicit sending / sent / error states.
 
-**Submission runs through Netlify Forms.** There is no server in this project and both client sites already deploy there. Two things make it work:
+**Submissions go into Supabase** and surface at [/admin](#admin-panel). This previously ran through Netlify Forms, which worked but tied the form to one host and never worked in development.
 
-1. A hidden static twin of the form in [index.html](index.html) — Netlify's detection scans the *built HTML* and cannot see a form React renders at runtime. It must keep the same `name` and the same field names as the real one.
-2. The React form POSTs url-encoded to `/` with `form-name` set.
+`public.enquiries` is the only table in the schema an anonymous visitor may write to — which is what a contact form is, so the defence is keeping the blast radius small rather than authenticating. Insert only: no read, no update, no delete. Column constraints in [0008](supabase/migrations/0008_enquiries_and_admin.sql) cap one submission at 5000 characters and twenty service tags, because otherwise a single request can put a megabyte in your database.
 
-Entries then appear under **Forms** in the Netlify dashboard; add a notification there to get them by email.
+Two small details:
 
-> **Locally it will fail, and that is expected.** Nothing listens at `/` in `npm run dev`, so submitting lands in the error state — verified: *"Could not send (Server responded 404). Email me at …"*, with the address as a working mailto fallback. If you deploy somewhere other than Netlify, swap the `fetch` in `onSubmit` for your endpoint (Formspree, a serverless function, whatever) and delete the hidden twin.
+- **No `.select()` after the insert.** PostgREST needs SELECT rights to hand back the row it just wrote, and the public has none — asking for it would turn every successful submission into a permission error.
+- **The honeypot reports success.** A bot that fills `bot-field` gets the sent state and nothing is written. Returning an error would tell it what to avoid next time, and a real person can never reach that branch.
 
-A honeypot field (`bot-field`) catches the dumber bots.
+Errors the visitor cannot act on — a missing table, an RLS rejection — collapse to one sentence and the mailto fallback, with the real message logged to the console for whoever can fix it. Verified against a live database: *"Could not send (the form is not set up correctly at my end). Email me at …"*
+
+<a id="admin-panel"></a>
+
+---
+
+## Admin panel
+
+[/admin](src/pages/admin/AdminPage.tsx), admin-only, deliberately separate from `/studio`. The studio is a tool several people share; this is a single-occupancy room, and mixing "read someone's email address" into a screen contributors also use invites the kind of mistake where a permission check moves and nobody notices.
+
+- **Enquiries** — everything the contact form collected. Status filters, expandable rows, reply-by-email, and read/replied/archived/spam marking that stamps who handled it.
+- **People** — every account: email, role, confirmed or not, last sign-in, and post counts. Expand a row for that person's posts with per-post view counts.
+
+The People tab reads `auth.users`, which no browser-facing role can touch. It goes through `admin_people_overview()` — a `security definer` function that checks `is_admin()` internally, so a non-admin calling the RPC directly gets an empty result rather than an error, and never sees an address. Verified: signed out, `/admin` renders the gate and makes **zero** Supabase calls.
 
 ---
 

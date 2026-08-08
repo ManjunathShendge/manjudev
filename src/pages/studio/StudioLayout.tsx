@@ -34,6 +34,11 @@ export function StudioLayout({ children }: { children: ReactNode }) {
           <span className="label hidden text-faint sm:block">Studio</span>
 
           <div className="ml-auto flex items-center gap-4">
+            {isAdmin && (
+              <Link to="/admin" className="label text-gold no-underline hover:text-gold-hot">
+                Admin
+              </Link>
+            )}
             <Link to="/blog" className="label text-faint no-underline hover:text-foreground">
               View blog
             </Link>

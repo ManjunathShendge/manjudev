@@ -27,6 +27,9 @@ const BlogPostPage = lazy(() =>
 const StudioRoutes = lazy(() =>
   import("@/pages/studio/StudioRoutes").then((m) => ({ default: m.StudioRoutes })),
 )
+const AdminPage = lazy(() =>
+  import("@/pages/admin/AdminPage").then((m) => ({ default: m.AdminPage })),
+)
 const NotFoundPage = lazy(() =>
   import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 )
@@ -61,6 +64,7 @@ export default function App() {
             <Route path="/blog" element={<BlogIndexPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/studio/*" element={<StudioRoutes />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>

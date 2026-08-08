@@ -12,20 +12,6 @@
     />
   </head>
   <body>
-    <!--
-      Netlify Forms detection runs against the built HTML, and it cannot see a
-      form that React renders at runtime. This hidden twin is what registers the
-      form; the real one lives in src/components/LeadForm.tsx and must keep the
-      same name and the same field names as this.
-    -->
-    <form name="project-enquiry" netlify netlify-honeypot="bot-field" hidden>
-      <input type="text" name="name" />
-      <input type="email" name="email" />
-      <input type="text" name="company" />
-      <input type="text" name="services" />
-      <textarea name="message"></textarea>
-    </form>
-
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

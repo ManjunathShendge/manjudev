@@ -2,9 +2,8 @@ import { useState, type FormEvent } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { Button } from "@/components/ui/button"
 import { serviceOptions, profile } from "@/data/story"
+import { sendEnquiry } from "@/lib/blog/enquiries"
 import { cn } from "@/lib/utils"
-
-const FORM_NAME = "project-enquiry"
 
 type Status = "idle" | "sending" | "sent" | "error"
 
@@ -12,13 +11,15 @@ const field =
   "w-full rounded-none border border-hair bg-background/60 px-4 py-3 text-sm text-foreground placeholder:text-faint transition-colors duration-300 focus:border-gold/50 focus:outline-none"
 
 /**
- * Netlify Forms handles the submission — there is no server in this project and
- * both of the client sites already deploy there. Detection needs a static copy
- * of this form in index.html; that hidden twin must keep the same name and the
- * same field names as this one.
+ * Enquiries go into Supabase and show up under /admin.
  *
- * Locally there is nothing listening at "/", so submitting in `npm run dev`
- * will land in the error state. That is expected; it works once deployed.
+ * This used to POST to Netlify Forms, which worked but tied the form to one
+ * host and never worked in development. The `enquiries` table is the only
+ * thing in the schema an anonymous visitor may write to — insert only, no read
+ * — with length limits in the migration capping what one request can carry.
+ *
+ * Unlike the old version this now works locally, which means a failure here is
+ * a real failure rather than the expected dev-mode 404.
  */
 export function LeadForm() {
   const [status, setStatus] = useState<Status>("idle")
@@ -37,16 +38,26 @@ export function LeadForm() {
 
     const form = e.currentTarget
     const data = new FormData(form)
-    data.set("form-name", FORM_NAME)
-    data.set("services", picked.join(", "))
+    const value = (key: string) => String(data.get(key) ?? "").trim()
+
+    // Honeypot. Bots fill in every field they find; people never see this one.
+    // Reporting success rather than an error means a bot has no signal to
+    // learn from, and a real person could never end up here anyway.
+    if (value("bot-field")) {
+      setStatus("sent")
+      form.reset()
+      setPicked([])
+      return
+    }
 
     try {
-      const res = await fetch("/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(data as unknown as Record<string, string>).toString(),
+      await sendEnquiry({
+        name: value("name"),
+        email: value("email"),
+        company: value("company") || null,
+        services: picked,
+        message: value("message"),
       })
-      if (!res.ok) throw new Error(`Server responded ${res.status}`)
       setStatus("sent")
       form.reset()
       setPicked([])
@@ -65,8 +76,7 @@ export function LeadForm() {
         Tell me what you are building and I will come back with scope, a timeline and a price.
       </p>
 
-      <form name={FORM_NAME} method="POST" data-netlify="true" onSubmit={onSubmit} className="grid gap-4">
-        <input type="hidden" name="form-name" value={FORM_NAME} />
+      <form onSubmit={onSubmit} className="grid gap-4">
         {/* Honeypot: real people leave this empty, bots fill it in. */}
         <p className="hidden">
           <label>

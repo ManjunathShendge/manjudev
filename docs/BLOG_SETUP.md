@@ -49,6 +49,7 @@ whole contents of each and pressing Run:
 | — | `supabase/migrations/0004_notifications.sql` | Optional — email on new contributions. Needs the setup in step 6. |
 | 4 | `supabase/migrations/0006_open_contribution.sql` | Signing up grants writing access directly. Publishing stays gated. Reversible. |
 | 5 | `supabase/migrations/0007_remove_applications.sql` | Drops the application table and its triggers. Destructive — see the note in the file. |
+| 6 | `supabase/migrations/0008_enquiries_and_admin.sql` | The lead-form table and the `/admin` overview. **Required** — the contact form writes here. |
 
 `0005_withdraw_application.sql` is skipped: it added a policy to a table that
 `0007` removes. It is kept only so the numbering matches the git history.
@@ -279,9 +280,48 @@ admins can reach `published`, `scheduled` or `archived`.
 | `/studio/people` | Roles — admins |
 | `/studio/apply` | Contributor application |
 | `/studio/account` | Your profile and password |
+| `/admin` | Enquiries, accounts and per-author content — admin only |
 
 `public/_redirects` rewrites everything to `index.html` so these survive a hard
 refresh on Netlify. On any other host, set up the equivalent SPA fallback.
+
+---
+
+## The admin panel
+
+`/admin` is admin-only and separate from `/studio` on purpose — the studio is a
+tool several people share, and mixing "read someone's email address" into a
+screen contributors also use invites the kind of mistake where a permission
+check moves and nobody notices. There is a link to it in the studio header
+when your role is `admin`.
+
+**Enquiries** — everything the contact form has collected. Filter by status,
+expand a row to read the message and the services they picked, reply by email,
+and mark it read / replied / archived / spam. The status change stamps who
+handled it and when.
+
+**People** — every account, with the email address, role, whether the address
+is confirmed, when they last signed in, and what they have written. Expand a
+row for that person's posts with per-post view counts.
+
+That screen reads `auth.users`, which no browser-facing role is allowed to
+touch. It works through `admin_people_overview()`, a `security definer`
+function that checks `is_admin()` itself — a non-admin calling it directly gets
+an empty result rather than an error, and never sees an address.
+
+### The contact form
+
+The form in chapter 08 writes to `public.enquiries`. That table is the only
+place in the schema an anonymous stranger may write to, which is what a contact
+form is; the defence is keeping the blast radius small rather than
+authenticating. They may insert and nothing else — no read, no update, no
+delete — and column constraints cap one submission at 5000 characters of
+message and twenty service tags.
+
+It used to go through Netlify Forms. That worked, but tied the form to one host
+and never worked in development. **If you have not run `0008`, the form will
+fail** with "the form is not set up correctly at my end" and offer your email
+address instead.
 
 ---
 
