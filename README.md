@@ -77,6 +77,33 @@ The script walks each page top to bottom first so lazy images and reveal animati
 
 ---
 
+## Identity — mark, icons, link preview
+
+The mark appears in three places: the loading curtain, the top bar, and the browser tab.
+
+| File | Used by |
+|---|---|
+| `public/favicon.ico` | 16/32/48 — older browsers and Windows shortcuts |
+| `public/favicon-96x96.png` | hi-dpi browser tabs |
+| `public/apple-touch-icon.png` | iOS home screen, 180px |
+| `public/web-app-manifest-{192,512}.png` | Android / installed PWA, via `site.webmanifest` |
+| `public/logo.png` | the top bar and the loader — same artwork, 6KB |
+| `public/og.png` | link previews, 1200×630, generated |
+
+`public/favicon.svg` ships but is deliberately **not** linked from `index.html`. It is the same raster wrapped in an `<svg>` element, so a browser that prefers SVG icons would fetch 136KB where the PNG is 6KB, for identical pixels. Link it back the day a true vector mark replaces it — the line is commented in the head.
+
+To re-render the preview card after a copy or colour change:
+
+```bash
+node scripts/make-og-card.mjs
+```
+
+It screenshots real HTML using the site's own typefaces and hex values rather than placing pixels by hand, so the card can't drift away from the site.
+
+> **One thing left to do:** `og:image` in [index.html](index.html) is a relative path. Most scrapers resolve that against the page URL, but the spec wants absolute and X holds you to it. Once the site has a domain, make `og:image` and `twitter:image` absolute — both lines are marked in the head comment.
+
+---
+
 ## Design system
 
 **Gold on violet ink.** The usual take on "futuristic dark" is near-black plus one acid-neon accent. This goes elsewhere: the ground `#08070C` is biased toward violet so the page sits in one hue family, and the single bold move is a warm gold — premium rather than gamer-RGB. Periwinkle appears only in the ambient canvas glow; mint only on the "open to roles" status dot, where it means something.
@@ -111,8 +138,11 @@ Unbounded is very wide, so the hero size is capped at `clamp(2.4rem, 8.4vw, 7.5r
 ```
 public/projects/               real screenshots of the live deployments
 public/_redirects              SPA fallback so /blog and /studio survive a refresh
+public/og.png                  1200×630 link-preview card, generated
 scripts/capture-shots.mjs      re-captures the project screenshots
+scripts/make-og-card.mjs       re-renders public/og.png
 supabase/migrations/           the blog schema, run these in the SQL editor
+supabase/seed_posts.sql        nine starter articles, published under your byline
 docs/BLOG_SETUP.md             what you have to do to switch the blog on
 src/
 ├── data/story.ts              ← all content lives here; edit this, not the components

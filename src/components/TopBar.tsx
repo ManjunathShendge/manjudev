@@ -19,13 +19,23 @@ export function TopBar() {
       transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-x-0 top-0 z-45 flex items-center justify-between gap-4 border-b border-hair bg-background/72 px-5 py-3 backdrop-blur-md md:px-9"
     >
-      {/* The full name plus two links does not fit a 390px bar — it wrapped to
-          two rows. On a phone the first name is enough; you are on his site. */}
+      {/* The mark plus the full name plus two links does not fit a 390px bar.
+          On a phone the mark alone is the wordmark — that is what a mark is
+          for — and the name returns from `sm` up.
+
+          /logo.png rather than /logo.svg: the SVG is the same raster wrapped
+          in a vector element, 136KB against 6KB, for a 26px disc. */}
       <a
         href="#top"
-        className="font-display text-sm font-semibold tracking-tight whitespace-nowrap no-underline"
+        className="flex items-center gap-2.5 font-display text-sm font-semibold tracking-tight whitespace-nowrap no-underline"
       >
-        <span className="sm:hidden">{profile.first}</span>
+        <img
+          src="/logo.png"
+          alt=""
+          width={26}
+          height={26}
+          className="size-6.5 shrink-0 rounded-full"
+        />
         <span className="hidden sm:inline">{profile.name}</span>
       </a>
       <span className="label hidden text-faint md:block">{profile.role}</span>

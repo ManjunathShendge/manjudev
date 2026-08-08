@@ -1,0 +1,31 @@
+{
+  "name": "Manjunath P Shendge — Software Engineer",
+  "short_name": "Manjunath",
+  "description": "Full-stack engineer in Bengaluru building production web platforms — React and Next.js on the surface, APIs, schemas and data pipelines underneath.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#08070C",
+  "theme_color": "#08070C",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

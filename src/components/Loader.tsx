@@ -132,6 +132,17 @@ export function Loader() {
       />
 
       <div className="relative mx-auto w-full max-w-160">
+        {/* The mark sits above the prompt like a boot splash, aligned to the
+            same left edge as the text. Decorative — the aria-label on the
+            curtain already says "Loading" — so it carries an empty alt. */}
+        <img
+          src="/logo.png"
+          alt=""
+          width={44}
+          height={44}
+          className="mb-7 size-11 rounded-full ring-1 ring-gold/25"
+        />
+
         <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap text-muted-foreground sm:text-sm">
           {LINES.map((_, i) => (
             <div key={i} className={i === 1 ? "text-gold" : undefined}>
