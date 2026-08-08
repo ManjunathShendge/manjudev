@@ -22,9 +22,10 @@ You asked for it to read like you telling your own story, so the page is structu
 | 03 | Proof | Cards **pin and stack**, leaving a readable tab strip per project; each carries a **gallery** of real screenshots |
 | 04 | The Hard Part | Pinned set-piece: counter, progress and grid all bound to scroll position |
 | 05 | Toolkit | **GSAP staggered grid** — columns rise at different rates, project bento scales up in the centre |
-| 06 | Writing | The latest posts, pulled live from the blog — the hand-off to `/blog` |
+| 06 | Writing | Why I write, and that the blog is open to contributors |
 | 07 | Services | Freelance availability, build services grid, and SEO/GEO/SMM |
 | 08 | What's Next | Direct contact rows plus the lead capture form |
+| — | Latest writing | Six most recent posts as cards, then a door out to `/blog`. Renders nothing until something is published. |
 
 Chapter 04 is the peak. `350,000` is not a count-up on a timer — it is `useTransform(scrollYProgress → rows)`, so the rows arrive at exactly the speed you scroll, the grid of 200 cells fills top-down as they land, and the four pipeline steps light one at a time. Scroll back up and the migration runs backwards.
 

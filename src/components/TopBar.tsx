@@ -19,21 +19,27 @@ export function TopBar() {
       transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
       className="fixed inset-x-0 top-0 z-45 flex items-center justify-between gap-4 border-b border-hair bg-background/72 px-5 py-3 backdrop-blur-md md:px-9"
     >
-      <a href="#top" className="font-display text-sm font-semibold tracking-tight no-underline">
-        {profile.name}
+      {/* The full name plus two links does not fit a 390px bar — it wrapped to
+          two rows. On a phone the first name is enough; you are on his site. */}
+      <a
+        href="#top"
+        className="font-display text-sm font-semibold tracking-tight whitespace-nowrap no-underline"
+      >
+        <span className="sm:hidden">{profile.first}</span>
+        <span className="hidden sm:inline">{profile.name}</span>
       </a>
       <span className="label hidden text-faint md:block">{profile.role}</span>
 
-      <nav className="ml-auto flex items-center gap-5">
+      <nav className="ml-auto flex items-center gap-4 sm:gap-5">
         <Link
           to="/blog"
-          className="label text-faint no-underline transition-colors duration-300 hover:text-foreground"
+          className="label whitespace-nowrap text-faint no-underline transition-colors duration-300 hover:text-foreground"
         >
           Writing
         </Link>
         <a
           href={`mailto:${profile.email}`}
-          className="label border-b border-gold/35 pb-px text-gold no-underline"
+          className="label border-b border-gold/35 pb-px whitespace-nowrap text-gold no-underline"
         >
           Get in touch
         </a>

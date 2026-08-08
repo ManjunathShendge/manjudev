@@ -11,6 +11,7 @@ import { Toolkit } from "@/components/sections/Toolkit"
 import { Writing } from "@/components/sections/Writing"
 import { Services } from "@/components/sections/Services"
 import { Next } from "@/components/sections/Next"
+import { LatestWriting } from "@/components/sections/LatestWriting"
 
 /**
  * The story. This was the whole of App.tsx before the blog arrived; it is now
@@ -43,6 +44,9 @@ export function PortfolioPage() {
           <Writing />
           <Services />
           <Next />
+          {/* After the story rather than part of it — renders nothing until
+              something is published. */}
+          <LatestWriting />
         </div>
       </main>
     </>

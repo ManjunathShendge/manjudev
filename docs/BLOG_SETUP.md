@@ -58,6 +58,12 @@ whole contents of each and pressing Run:
 Then optionally run `supabase/seed.sql` for six starter categories. Edit that
 file first if you want different ones.
 
+Optionally after that, `supabase/seed_posts.sql` publishes nine starter
+articles under your byline — real, sourced pieces on the stack this site is
+built with, written to be findable. It needs your profile to exist, so sign in
+once at `/studio` first; it refuses to run otherwise rather than filing the
+posts under nobody. Delete any you would rather not have from `/studio`.
+
 Every file is safe to re-run.
 
 > **If `0003` errors with "must be owner of table objects":** some Supabase
