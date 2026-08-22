@@ -128,15 +128,15 @@ export const projects = [
     label: "tripnexus.netlify.app",
   },
   {
-    id: "anl",
+    id: "orelp",
     index: "02",
-    name: "All New Launches",
-    status: "In progress",
+    name: "Orelp",
+    status: "Live",
     kind: "Client work",
     shots: [
-      { src: "/projects/anl-1.jpg", caption: "Homepage — property search across cities" },
-      { src: "/projects/anl-2.jpg", caption: "Discovery sections built on the migrated schema" },
-      { src: "/projects/anl-3.jpg", caption: "Listings rendered from Supabase, ~350k rows behind them" },
+      { src: "/projects/orelp-1.jpg", caption: "Homepage — property search across cities" },
+      { src: "/projects/orelp-2.jpg", caption: "Service sections — search, consultation and end-to-end assistance" },
+      { src: "/projects/orelp-3.jpg", caption: "Listings rendered from Supabase, ~350k rows behind them" },
     ],
     line: "A real estate portal rebuilt on Next.js and Supabase, migrating off a legacy WordPress/WPL stack.",
     points: [
@@ -145,8 +145,8 @@ export const projects = [
       "Built a role-based agent dashboard with a multi-step listing form, a blog system, auth flows and animated homepage sections.",
     ],
     stack: ["Next.js", "TypeScript", "Tailwind", "Supabase", "Razorpay", "Python"],
-    href: "https://allnewlaunches.netlify.app",
-    label: "allnewlaunches.netlify.app",
+    href: "https://orelp.com/",
+    label: "orelp.com",
   },
   {
     id: "attendance",
@@ -297,7 +297,7 @@ export const hardPart = {
   chapter: "The hard part",
   title: "350,000 rows had to move, and none of them could break.",
   intro:
-    "All New Launches ran on WordPress. Years of listings, agents and users lived in a WPL schema that was never designed to be read by anything else. The rebuild only mattered if every row arrived.",
+    "Orelp ran on WordPress. Years of listings, agents and users lived in a WPL schema that was never designed to be read by anything else. The rebuild only mattered if every row arrived.",
   steps: [
     {
       k: "Read",

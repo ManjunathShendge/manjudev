@@ -122,7 +122,7 @@ raw (slug, title, excerpt, category_slug, featured, days_ago, seo_title, seo_des
     'WordPress to Supabase migration: 350,000 rows, one pipeline',
     'How a real estate portal moved roughly 350,000 WordPress/WPL rows into Supabase Postgres: schema mapping, a re-runnable Python pipeline, lifting users into Supabase Auth, and the 301 map that protected organic traffic.',
     $html$
-<p>All New Launches was a WordPress site with years of property data inside it. The rebuild runs on Next.js and Supabase, and the only version of that rebuild which counted as finished was the one where every listing, every agent and every login arrived on the other side.</p>
+<p>Orelp was a WordPress site with years of property data inside it. The rebuild runs on Next.js and Supabase, and the only version of that rebuild which counted as finished was the one where every listing, every agent and every login arrived on the other side.</p>
 <p>Roughly 350,000 rows moved. This is what that actually involved.</p>
 
 <h2>Why a WPL listing is not a row</h2>
